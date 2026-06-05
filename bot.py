@@ -1,6 +1,9 @@
 import os
+import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from telegram.ext import Application, CommandHandler, ContextTypes
+
+logging.basicConfig(level=logging.INFO)
 
 TOKEN = os.environ.get("TOKEN", "8974944600:AAG7w7leXkMsN9QVp8fyl5WoaqKNbKShmyc")
 WEB_APP_URL = "https://nzdyfnk8m2-cyber.github.io/chocolatrichoms/"
@@ -12,14 +15,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             web_app=WebAppInfo(url=WEB_APP_URL)
         )
     ]]
-    reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(
         "Bienvenue chez ChocolaTrichoms&Terps!\n\nAppuyez sur le bouton pour acceder a la boutique",
-        reply_markup=reply_markup
+        reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-if __name__ == "__main__":
-    app = ApplicationBuilder().token(TOKEN).build()
+def main():
+    app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     print("Bot demarre!")
-    app.run_polling(allowed_updates=Update.ALL_TYPES)
+    app.run_polling()
+
+if __name__ == "__main__":
+    main()
