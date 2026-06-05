@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+  <title>ChocolaTrichomes&Terps</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    html,body{background:#111310;color:#fff;font-family:'Inter',sans-serif;max-width:430px;margin:0 auto;min-height:100vh;overflow-x:hidden;}
+
+    /* ── HEADER ── */
+    .header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;position:sticky;top:0;z-index:200;background:#111310;border-bottom:1px solid rgba(255,255,255,0.05);}
+    .header-logo{font-size:0.78rem;font-weight:700;letter-spacing:0.15em;color:#c9a84c;text-transform:uppercase;flex:1;text-align:center;}
+    .header-left,.header-right{display:flex;align-items:center;gap:10px;min-width:60px;}
+    .header-right{justify-content:flex-end;}
+    .btn-rabat{background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);color:#c9a84c;font-size:0.72rem;font-weight:600;padding:5px 12px;border-radius:8px;cursor:pointer;}
+    .btn-cart-header{
+      background:rgba(201,168,76,0.15);
+      border:1px solid rgba(201,168,76,0.3);
+      width:34px;
+      height:34px;
+      border-radius:10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1rem;
+      cursor:pointer;
+      position:relative;
+    }
+    .cart-badge{
+      position:absolute;
+      top:-5px;
+      right:-5px;
+      background:#c9a84c;
+      color:#111;
+      font-size:0.55rem;
+      font-weight:800;
+      width:16px;
+      height:16px;
+      border-radius:50%;
+      display:none;
+      align-items:center;
+      justify-content:center;
+    }
+    .hamburger{font-size:1.2rem;cursor:pointer;color:#c9a84c;}
+
+    /* ── SIDE MENU ── */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+    .overlay.open{opacity:1;pointer-events:all;}
+    .side-menu{
+      position:fixed;
+      top:0;
+      left:-100%;
+      width:75%;
+      max-width:300px;
+      height:100%;
+      background:#0f1a0d;
+      z-index:400;
+      transition:left 0.3s cubic-bezier(0.4,0,0.2,1);
+      overflow-y:auto;
+      border-right:1px solid rgba(201,168,76,0.15);
+    }
+    .side-menu.open{left:0;}
+    .side-menu-header{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.06);}
+    .side-menu-logo{font-size:0.78rem;font-weight:700;letter-spacing:0.15em;color:#c9a84c;text-transform:uppercase;}
+    .side-menu-sub{font-size:0.7rem;color:#666;margin-top:3px;}
+    .menu-item{display:flex;align-items:center;gap:14px;padding:14px 20px;cursor:pointer;transition:background 0.15s;border-bottom:1px solid rgba(255,255,255,0.03);}
+    .menu-item:hover,.menu-item.active{background:rgba(201,168,76,0.08);}
+    .menu-item.active .menu-item-label{color:#c9a84c;font-weight:600;}
+    .menu-icon{width:32px;height:32px;background:rgba(255,255,255,0.06);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;}
+    .menu-item.active .menu-icon{background:rgba(201,168,76,0.15);}
+    .menu-item-label{font-size:0.88rem;font-weight:500;color:#ccc;}
+
+    /* ── HOME BLOCKS ── */
+    .trc-block{margin:12px 12px 0;background:linear-gradient(135deg,#1a2010,#0f1a0d);border:1px solid rgba(201,168,76,0.25);border-radius:16px;padding:14px 16px;position:relative;overflow:hidden;}
+    .trc-block::before{
+      content:'CHOCOLATRICHOMES';
+      position:absolute;
+      font-size:4rem;
+      font-weight:900;
+      color:rgba(255,255,255,0.03);
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      white-space:nowrap;
+      pointer-events:none;
+    }
+    .trc-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+    .trc-icon{width:36px;height:36px;background:radial-gradient(circle,#3a7a30,#1a4010);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+    .trc-title{font-size:0.9rem;font-weight:700;color:#c9a84c;}
+    .trc-sub{font-size:0.72rem;color:#888;margin-top:2px;}
+    .trc-activate{margin-left:auto;font-size:0.65rem;font-weight:700;color:#888;letter-spacing:0.1em;}
+    .trc-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+    .trc-stat{background:rgba(0,0,0,0.3);border-radius:10px;padding:10px;text-align:center;}
+    .trc-stat-val{font-size:1.1rem;font-weight:800;color:#c9a84c;}
+    .trc-stat-label{font-size:0.62rem;color:#666;margin-top:2px;}
+    .trc-link{font-size:0.78rem;color:#888;text-align:center;cursor:pointer;display:block;}
+    .trc-link span{color:#c9a84c;}
+    .checkin-card{margin:10px 12px 0;background:#1a1e18;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px 16px;}
+    .checkin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+    .checkin-title{font-size:0.88rem;font-weight:600;}
+    .checkin-streak{font-size:0.78rem;color:#ff6b35;font-weight:600;}
+    .checkin-days{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;}
+    .checkin-days::-webkit-scrollbar{display:none;}
+    .day-box{
+      min-width:38px;
+      height:48px;
+      border-radius:10px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      font-size:0.65rem;
+      font-weight:600;
+      color:#666;
+      background:#0f1a0d;
+      border:1px solid rgba(255,255,255,0.06);
+      flex-shrink:0;
+      gap:2px;
+    }
+    .day-box.done{background:#2d5a27;color:white;border-color:#3a7a30;}
+    .day-box.active{background:#1e3a1c;color:#c9a84c;border-color:#c9a84c;}
+    .day-label{font-size:0.55rem;color:#555;}
+    .day-box.done .day-label,.day-box.active .day-label{color:rgba(255,255,255,0.6);}
+    .btn-claim{width:100%;background:linear-gradient(135deg,#4CAF50,#8BC34A);border:none;border-radius:12px;padding:14px;font-size:0.92rem;font-weight:700;color:white;cursor:pointer;}
+    .tier-section{margin:10px 12px 0;background:#1a1e18;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px 16px;}
+    .tier-label{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:#c9a84c;font-weight:700;margin-bottom:4px;}
+    .tier-desc{font-size:0.78rem;color:#888;margin-bottom:14px;}
+    .tier-desc span{color:#c9a84c;font-weight:600;}
+    .tier-card{background:#0f1a0d;border:1px solid rgba(201,168,76,0.3);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+    .tier-badge{
+      width:52px;
+      height:52px;
+      border-radius:50%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      flex-shrink:0;
+      font-size:1.5rem;
+      border:2px solid #cd7f32;
+      box-shadow:0 0 15px rgba(205,127,50,0.3);
+    }
+    .tier-name{font-size:0.55rem;color:#cd7f32;font-weight:800;letter-spacing:0.08em;margin-top:2px;}
+    .tier-info .tier-hold{font-size:0.65rem;color:#888;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;}
+    .tier-info .tier-discount{font-size:2rem;font-weight:900;color:white;line-height:1;}
+    .tier-info .tier-sub{font-size:0.78rem;color:#aaa;margin-top:4px;}
+    .tier-info .tier-perk{font-size:0.72rem;color:#c9a84c;margin-top:3px;}
+    .dots{display:flex;justify-content:center;gap:5px;margin-bottom:14px;}
+    .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.2);}
+    .dot.active{background:#c9a84c;}
+    .btn-activate{
+      width:100%;
+      background:linear-gradient(135deg,#6f4fcf,#9b59b6);
+      border:none;
+      border-radius:12px;
+      padding:14px;
+      font-size:0.92rem;
+      font-weight:700;
+      color:white;
+      cursor:pointer;
+      margin-bottom:10px;
+    }
+    .trichomecoin-link{font-size:0.78rem;color:#888;text-align:center;display:block;cursor:pointer;text-decoration:none;}
+    .promo-banners{margin:14px 12px 0;display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;}
+    .promo-banners::-webkit-scrollbar{display:none;}
+    .promo-banner{min-width:260px;height:90px;border-radius:14px;flex-shrink:0;border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;padding:14px 16px;gap:12px;}
+    .promo-icon{font-size:1.4rem;flex-shrink:0;}
+    .promo-title{font-size:0.82rem;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;}
+    .promo-sub{font-size:0.7rem;color:#ccc;margin-top:3px;}
+
+    /* ── GRID ── */
+    .section-header{display:flex;align-items:center;gap:8px;padding:18px 12px 10px;font-size:0.78rem;font-weight:700;color:#888;letter-spacing:0.1em;text-transform:uppercase;}
+    .products-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 12px 120px;}
+    .product-card{background:#1a1e18;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);cursor:pointer;transition:transform 0.15s;}
+    .product-card:active{transform:scale(0.97);}
+    .product-img-wrap{position:relative;width:100%;padding-top:80%;background:#1e201c;overflow:hidden;}
+    .product-img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+    .badge-stock{
+      position:absolute;
+      top:8px;
+      left:8px;
+      background:rgba(15,26,13,0.9);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:100px;
+      padding:3px 10px;
+      font-size:0.62rem;
+      font-weight:600;
+      display:flex;
+      align-items:center;
+      gap:5px;
+      backdrop-filter:blur(8px);
+      z-index:2;
+    }
+    .dot-green{width:6px;height:6px;border-radius:50%;background:#4CAF50;flex-shrink:0;}
+    .product-info{padding:10px 10px 12px;}
+    .product-cat{font-size:0.6rem;color:#c9a84c;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px;}
+    .product-name{font-size:0.82rem;font-weight:700;color:#fff;margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .product-footer{display:flex;align-items:center;justify-content:space-between;}
+    .product-price{font-size:1rem;font-weight:800;color:#fff;}
+    .product-price .currency{font-size:0.72rem;font-weight:500;color:#888;margin-left:3px;}
+    .btn-add{
+      width:32px;
+      height:32px;
+      background:rgba(201,168,76,0.2);
+      border:1px solid rgba(201,168,76,0.4);
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1.1rem;
+      color:#c9a84c;
+      cursor:pointer;
+      flex-shrink:0;
+      transition:all 0.2s;
+    }
+    .btn-add:active{transform:scale(0.85);}
+    .btn-add.added{background:#c9a84c;color:#111;border-color:#c9a84c;}
+
+    /* ── DETAIL PAGE ── */
+    #detailPage{position:fixed;inset:0;background:#111310;z-index:600;overflow-y:auto;transform:translateX(100%);transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);max-width:430px;margin:0 auto;}
+    #detailPage.open{transform:translateX(0);}
+    .detail-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;position:sticky;top:0;background:#111310;z-index:10;border-bottom:1px solid rgba(255,255,255,0.05);}
+    .detail-back{width:36px;height:36px;background:rgba(255,255,255,0.08);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;}
+    .detail-topbar-title{font-size:0.78rem;font-weight:700;letter-spacing:0.15em;color:#c9a84c;text-transform:uppercase;}
+    .detail-fav{width:36px;height:36px;background:rgba(255,255,255,0.08);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;}
+    .detail-img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#1e201c;}
+    .detail-body{background:linear-gradient(180deg,#1a1e18 0%,#111310 100%);border-radius:24px 24px 0 0;margin-top:-20px;padding:24px 20px 0;position:relative;}
+    .detail-name{font-size:1.6rem;font-weight:800;color:#fff;line-height:1.15;margin-bottom:6px;}
+    .detail-price-inline{font-size:1.4rem;font-weight:800;color:#c9a84c;margin-bottom:2px;}
+    .detail-type-label{font-size:0.72rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#c9a84c;margin-bottom:16px;}
+    .detail-tags{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+    .detail-tag{
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:100px;
+      padding:6px 14px;
+      font-size:0.75rem;
+      font-weight:600;
+      color:#ccc;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .detail-tag .tag-meta{font-size:0.62rem;color:#666;font-weight:400;margin-left:2px;}
+    .detail-desc{font-size:0.85rem;color:#888;line-height:1.7;margin-bottom:20px;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:20px;}
+    .detail-type-row{display:flex;align-items:center;gap:12px;padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.06);}
+    .detail-type-icon{font-size:1.4rem;}
+    .detail-type-meta{font-size:0.62rem;color:#888;text-transform:uppercase;letter-spacing:0.1em;}
+    .detail-type-val{font-size:0.9rem;font-weight:600;color:#fff;margin-top:2px;}
+    .qty-label{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:#888;margin:20px 0 10px;}
+    .qty-selector{background:#1e201c;border:1px solid rgba(201,168,76,0.3);border-radius:14px;padding:16px;text-align:center;cursor:pointer;margin-bottom:24px;}
+    .qty-selector .qty-x{font-size:1.1rem;font-weight:800;color:#fff;}
+    .qty-selector .qty-dh{font-size:0.82rem;color:#888;margin-top:4px;}
+    .avis-title{font-size:1rem;font-weight:700;margin-bottom:12px;}
+    .avis-empty{background:rgba(255,255,255,0.04);border-radius:12px;padding:20px;text-align:center;font-size:0.82rem;color:#666;margin-bottom:12px;}
+    .avis-link{
+      color:#c9a84c;
+      font-size:0.82rem;
+      font-weight:600;
+      cursor:pointer;
+      display:block;
+      text-align:center;
+      padding:14px;
+      border:1px dashed rgba(201,168,76,0.3);
+      border-radius:12px;
+      margin-bottom:100px;
+    }
+
+    /* ── DETAIL BOTTOM BAR ── */
+    .detail-bottom{position:sticky;bottom:0;left:0;right:0;background:linear-gradient(to top,#111310 80%,transparent);padding:16px 20px 30px;display:flex;align-items:center;gap:12px;}
+    .detail-cart-icon{
+      width:48px;
+      height:48px;
+      background:#1e201c;
+      border:1px solid rgba(201,168,76,0.3);
+      border-radius:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1.2rem;
+      cursor:pointer;
+      flex-shrink:0;
+      position:relative;
+    }
+    .btn-add-to-cart{
+      flex:1;
+      background:linear-gradient(135deg,#c9a84c,#e8c97a);
+      border:none;
+      border-radius:14px;
+      padding:16px;
+      font-size:0.88rem;
+      font-weight:800;
+      color:#111;
+      cursor:pointer;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      transition:all 0.2s;
+    }
+    .btn-add-to-cart:active{transform:scale(0.97);}
+    .btn-add-to-cart.added{background:linear-gradient(135deg,#2d5a27,#4a8c3f);color:white;}
+
+    /* ── CART DRAWER ── */
+    .cart-drawer{
+      position:fixed;
+      bottom:-100%;
+      left:50%;
+      transform:translateX(-50%);
+      width:100%;
+      max-width:430px;
+      background:#1a1e18;
+      border-radius:24px 24px 0 0;
+      z-index:700;
+      transition:bottom 0.35s cubic-bezier(0.4,0,0.2,1);
+      border-top:1px solid rgba(201,168,76,0.2);
+      max-height:80vh;
+      overflow-y:auto;
+    }
+    .cart-drawer.open{bottom:0;}
+    .cart-handle{width:36px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:12px auto 0;}
+    .cart-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.06);}
+    .cart-title{font-size:1rem;font-weight:700;}
+    .cart-close{width:28px;height:28px;background:rgba(255,255,255,0.08);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+    .cart-items{padding:12px 16px;}
+    .cart-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+    .cart-item img{width:52px;height:52px;border-radius:10px;object-fit:cover;background:#222;flex-shrink:0;}
+    .cart-item-info{flex:1;min-width:0;}
+    .cart-item-name{font-size:0.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .cart-item-price{font-size:0.78rem;color:#c9a84c;font-weight:700;margin-top:3px;}
+    .cart-qty-ctrl{display:flex;align-items:center;gap:8px;}
+    .qty-btn{
+      width:26px;
+      height:26px;
+      border-radius:50%;
+      border:1px solid rgba(255,255,255,0.15);
+      background:rgba(255,255,255,0.06);
+      color:#fff;
+      font-size:0.9rem;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .qty-num{font-size:0.85rem;font-weight:700;min-width:16px;text-align:center;}
+    .cart-empty{padding:40px 20px;text-align:center;color:#666;font-size:0.9rem;}
+    .cart-footer{padding:16px 20px 30px;border-top:1px solid rgba(255,255,255,0.06);}
+    .cart-total{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+    .cart-total-label{font-size:0.88rem;color:#888;}
+    .cart-total-val{font-size:1.2rem;font-weight:800;color:#c9a84c;}
+    .btn-checkout{width:100%;background:linear-gradient(135deg,#c9a84c,#e8c97a);border:none;border-radius:14px;padding:16px;font-size:0.95rem;font-weight:700;color:#111;cursor:pointer;}
+
+    /* ── FLOAT + TOAST + NAV ── */
+    .float-cart{
+      position:fixed;
+      bottom:80px;
+      right:calc(50% - 215px + 10px);
+      width:52px;
+      height:52px;
+      background:#c9a84c;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1.3rem;
+      box-shadow:0 4px 20px rgba(201,168,76,0.4);
+      cursor:pointer;
+      z-index:50;
+      transition:transform 0.2s;
+    }
+    .float-cart:active{transform:scale(0.92);}
+    .float-badge{
+      position:absolute;
+      top:-4px;
+      right:-4px;
+      background:#ff4444;
+      color:#fff;
+      font-size:0.55rem;
+      font-weight:800;
+      width:18px;
+      height:18px;
+      border-radius:50%;
+      display:none;
+      align-items:center;
+      justify-content:center;
+    }
+    @media(max-width:430px){.float-cart{right:10px;}}
+    .toast{
+      position:fixed;
+      bottom:90px;
+      left:50%;
+      transform:translateX(-50%) translateY(20px);
+      background:#2d5a27;
+      color:#fff;
+      padding:10px 20px;
+      border-radius:100px;
+      font-size:0.82rem;
+      font-weight:600;
+      opacity:0;
+      transition:all 0.3s;
+      pointer-events:none;
+      white-space:nowrap;
+      z-index:800;
+      border:1px solid rgba(74,140,63,0.5);
+    }
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+    .bottom-nav{
+      position:fixed;
+      bottom:0;
+      left:50%;
+      transform:translateX(-50%);
+      width:100%;
+      max-width:430px;
+      background:#111310;
+      border-top:1px solid rgba(255,255,255,0.08);
+      display:flex;
+      padding:10px 0 20px;
+      z-index:100;
+    }
+    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px 0;}
+    .nav-icon{font-size:1.2rem;}
+    .nav-label{font-size:0.62rem;color:#666;font-weight:500;}
+    .nav-item.active .nav-label{color:#c9a84c;}
+    .nav-active-dot{width:18px;height:2px;background:#c9a84c;border-radius:2px;margin-top:2px;}
+  </style>
+</head>
+<body>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<!-- SIDE MENU -->
+<div class="side-menu" id="sideMenu">
+  <div class="side-menu-header">
+    <div class="side-menu-logo">CHOCOLATRICHOMES</div>
+    <div class="side-menu-sub">ChocolaTrichoms&Terps</div>
+  </div>
+  <div class="menu-item active" onclick="filterCat('Accessoires');closeAll()"><div class="menu-icon">💧</div><div class="menu-item-label">Accessoires</div></div>
+  <div class="menu-item" onclick="filterCat('HerbVape');closeAll()"><div class="menu-icon">⚡</div><div class="menu-item-label">HerbVape</div></div>
+  <div class="menu-item" onclick="filterCat('Most Wanted');closeAll()"><div class="menu-icon">⭐</div><div class="menu-item-label">Most Wanted</div></div>
+  <div class="menu-item" onclick="filterCat('Avis');closeAll()"><div class="menu-icon">💬</div><div class="menu-item-label">Avis</div></div>
+  <div class="menu-item" onclick="filterCat('TRC-Garden');closeAll()"><div class="menu-icon">🌱</div><div class="menu-item-label">TRC-Garden</div></div>
+  <div class="menu-item" onclick="filterCat('All');closeAll()"><div class="menu-icon">⊞</div><div class="menu-item-label">All</div></div>
+  <div class="menu-item" onclick="filterCat('Drysift');closeAll()"><div class="menu-icon">🕐</div><div class="menu-item-label">Drysift</div></div>
+  <div class="menu-item" onclick="filterCat('Frozen');closeAll()"><div class="menu-icon">❄️</div><div class="menu-item-label">Frozen</div></div>
+  <div class="menu-item" onclick="filterCat('Static');closeAll()"><div class="menu-icon">⚡</div><div class="menu-item-label">Static</div></div>
+  <div class="menu-item" onclick="filterCat(&quot;Ice O\'Lator&quot;);closeAll()"><div class="menu-icon">⭐</div><div class="menu-item-label">Ice O'Lator</div></div>
+  <div class="menu-item" onclick="filterCat('Beldia');closeAll()"><div class="menu-icon">🏠</div><div class="menu-item-label">Beldia</div></div>
+  <div class="menu-item" onclick="filterCat('Weed');closeAll()"><div class="menu-icon">🌿</div><div class="menu-item-label">Weed</div></div>
+  <div class="menu-item" onclick="filterCat('Meet Up Rabat');closeAll()"><div class="menu-icon">👥</div><div class="menu-item-label">Meet Up Rabat</div></div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left"><span class="hamburger" onclick="openMenu()">☰</span></div>
+  <div class="header-logo">CHOCOLATRICHOMES</div>
+  <div class="header-right">
+    <div class="btn-rabat">Rabat</div>
+    <div class="btn-cart-header" onclick="toggleCart()">🛍<div class="cart-badge" id="headerBadge">0</div></div>
+  </div>
+</div>
+
+<!-- TRC BLOCK -->
+<div class="trc-block">
+  <div class="trc-header">
+    <div class="trc-icon">🌿</div>
+    <div><div class="trc-title">Hold TRC, économise jusqu'à -20%</div><div class="trc-sub">Dès $5 hold → tier Bronze <span style="color:#c9a84c">-5%</span> à vie sur chaque commande</div></div>
+    <div class="trc-activate">→ ACTIVER</div>
+  </div>
+  <div class="trc-stats">
+    <div class="trc-stat"><div class="trc-stat-val">-20%</div><div class="trc-stat-label">Max Cardholder</div></div>
+    <div class="trc-stat"><div class="trc-stat-val">x5</div><div class="trc-stat-label">TRC/DH gagnés</div></div>
+    <div class="trc-stat"><div class="trc-stat-val">579</div><div class="trc-stat-label">Holders</div></div>
+  </div>
+  <div class="trc-link">Activer mon tier en 30 secondes <span>→</span></div>
+</div>
+
+<!-- CHECKIN -->
+<div class="checkin-card">
+  <div class="checkin-header"><div class="checkin-title">📅 Check-in quotidien</div><div class="checkin-streak">1 jours 🔥</div></div>
+  <div class="checkin-days">
+    <div class="day-box done"><span class="day-label">J1</span><span>✓</span></div>
+    <div class="day-box active"><span class="day-label">J2</span><span>20</span></div>
+    <div class="day-box"><span class="day-label">J3</span><span>30</span></div>
+    <div class="day-box"><span class="day-label">J4</span><span>40</span></div>
+    <div class="day-box"><span class="day-label">J5</span><span>50</span></div>
+    <div class="day-box"><span class="day-label">J6</span><span>75</span></div>
+    <div class="day-box"><span class="day-label">J7</span><span>100</span></div>
+  </div>
+  <button class="btn-claim">Récupérer 20 TRC</button>
+</div>
+
+<!-- TIER -->
+<div class="tier-section">
+  <div class="tier-label">🔴 Système TRC Cardholder</div>
+  <div class="tier-desc">Hold du TRC, économise jusqu'à <span>-20%</span> à vie sur chaque commande</div>
+  <div class="tier-card">
+    <div class="tier-badge">🥉<div class="tier-name">BRONZE</div></div>
+    <div class="tier-info">
+      <div class="tier-hold">HOLD $5+ TRC</div>
+      <div class="tier-discount">-5%</div>
+      <div class="tier-sub">à vie sur chaque commande</div>
+      <div class="tier-perk">+ Accès canal Telegram privé</div>
+    </div>
+  </div>
+  <div class="dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <button class="btn-activate">✨ Activer mon tier</button>
+  <a href="https://t.me/chocolatrichome_bot" target="_blank" class="trichomecoin-link">C'est quoi TrichomeCoin ? →</a>
+</div>
+
+<!-- PROMOS -->
+<div class="promo-banners">
+  <div class="promo-banner" style="background:linear-gradient(135deg,#1a1208,#2a1a08)"><div class="promo-icon">📦</div><div><div class="promo-title">Postal Delivery</div><div class="promo-sub">Try the new experience — get 10% off.</div></div></div>
+  <div class="promo-banner" style="background:linear-gradient(135deg,#0a0f1a,#0f1a2a)"><div class="promo-icon">💎</div><div><div class="promo-title">Hold TRC</div><div class="promo-sub">Get -5% discount on every order.</div></div></div>
+</div>
+
+<div class="section-header" id="sectionTitle"><span>🛒</span> ACCESSOIRES</div>
+<div class="products-grid" id="productsGrid"></div>
+
+<!-- FLOAT CART -->
+<div class="float-cart" onclick="toggleCart()">🛍<div class="float-badge" id="floatBadge"></div></div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ── DETAIL PAGE ── -->
+<div id="detailPage">
+  <div class="detail-topbar">
+    <div class="detail-back" onclick="closeDetail()">‹</div>
+    <div class="detail-topbar-title">DETAILS</div>
+    <div class="detail-fav">🤍</div>
+  </div>
+  <img class="detail-img" id="detailImg" src="" alt=""/>
+  <div class="detail-body">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+      <div class="detail-name" id="detailName"></div>
+      <div class="detail-price-inline" id="detailPriceTop"></div>
+    </div>
+    <div class="detail-type-label" id="detailTypeLabel"></div>
+    <div class="detail-tags" id="detailTags"></div>
+    <div class="detail-desc" id="detailDesc"></div>
+    <div class="detail-type-row">
+      <div class="detail-type-icon">📦</div>
+      <div><div class="detail-type-meta">TYPE</div><div class="detail-type-val">Accessoire</div></div>
+    </div>
+    <div class="qty-label">SÉLECTIONNER LA QUANTITÉ</div>
+    <div class="qty-selector" id="qtySelector" onclick="changeDetailQty()">
+      <div class="qty-x" id="detailQtyX">×1</div>
+      <div class="qty-dh" id="detailQtyDh"></div>
+    </div>
+    <div class="avis-title">Avis clients</div>
+    <div class="avis-empty">Aucun avis pour ce produit</div>
+    <div class="avis-link">Laisser un commentaire</div>
+  </div>
+  <div class="detail-bottom">
+    <div class="detail-cart-icon" onclick="toggleCart()">🛍<div class="cart-badge" id="detailBadge" style="position:absolute;top:-5px;right:-5px;background:#c9a84c;color:#111;font-size:0.55rem;font-weight:800;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;"></div></div>
+    <button class="btn-add-to-cart" id="btnAddToCart" onclick="addFromDetail()">ADD TO CART · <span id="detailPriceBtn"></span></button>
+  </div>
+</div>
+
+<!-- CART DRAWER -->
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-handle"></div>
+  <div class="cart-header"><div class="cart-title">🛍 Mon Panier</div><div class="cart-close" onclick="toggleCart()">✕</div></div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="cart-total"><div class="cart-total-label">Total</div><div class="cart-total-val" id="cartTotal">0 DH</div></div>
+    <button class="btn-checkout" onclick="checkout()">Commander via Telegram →</button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active"><div class="nav-icon">⊞</div><div class="nav-label">Home</div><div class="nav-active-dot"></div></div>
+  <div class="nav-item"><div class="nav-icon">🔍</div><div class="nav-label">Search</div></div>
+  <div class="nav-item" onclick="toggleCart()"><div class="nav-icon">🤍</div><div class="nav-label">Cart</div></div>
+  <div class="nav-item"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
+</div>
+
+<script>
+const PRODUCTS = [
+  {id:'bol_mix',
+    cat:'Accessoires',
+    name:'BOL A MIX',
+    price:70,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'raw_organic_ks',
+    cat:'Accessoires',
+    name:'RAW ORGANIC KING SIZE',
+    price:13,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'raw_organic_hemp',
+    cat:'Accessoires',
+    name:'RAW ORGANIC HEMP 1 1/4',
+    price:11,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'glass_ks',
+    cat:'Accessoires',
+    name:'GLASS KING SIZE',
+    price:25,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'raw_classic_14',
+    cat:'Accessoires',
+    name:'RAW CLASSIC 1 1/4',
+    price:11,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'raw_tips_200',
+    cat:'Accessoires',
+    name:'RAW TIPS 200',
+    price:130,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'raw_14_32f',
+    cat:'Accessoires',
+    name:'RAW 1 1/4 32 FEUILLES',
+    price:11,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'raw_filtres',
+    cat:'Accessoires',
+    name:'RAW FILTRES CARTON PERFORE',
+    price:25,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'raw_black_ks',
+    cat:'Accessoires',
+    name:'RAW BLACK KING SIZE',
+    price:15,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'raw_cone',
+    cat:'Accessoires',
+    name:'RAW CONE PRE-ROULE',
+    price:25,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'raw_org_roll',
+    cat:'Accessoires',
+    name:'RAW ORGANIC ROLL 5M',
+    price:30,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'raw_slim_ki',
+    cat:'Accessoires',
+    name:'RAW SLIM CLASSIC KS',
+    price:13,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'bic_petit',
+    cat:'Accessoires',
+    name:'BIC BRIQUET PETIT',
+    price:5,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'bic_grand',
+    cat:'Accessoires',
+    name:'BIC BRIQUET GRAND',
+    price:9,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'briquet_bic',
+    cat:'Accessoires',
+    name:'BRIQUET BIC',
+    price:7,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'ocb_rouleau',
+    cat:'Accessoires',
+    name:'OCB ROULEAU 4M',
+    price:25,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'ocb_org_hemp',
+    cat:'Accessoires',
+    name:'OCB ORGANIC HEMP PAPIER',
+    price:10,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'ocb_premium',
+    cat:'Accessoires',
+    name:'OCB PREMIUM 1 1/4',
+    price:10,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'ocb_blanc',
+    cat:'Accessoires',
+    name:'OCB BLANC 1 1/4',
+    price:10,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'ocb_xpert',
+    cat:'Accessoires',
+    name:'OCB X-PERT ULTRA-MINCE',
+    price:10,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'ocb_ult_slim',
+    cat:'Accessoires',
+    name:'OCB ULTIMATE SLIM',
+    price:13,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'ocb_xpert_slim',
+    cat:'Accessoires',
+    name:'OCB X-PERT SLIM',
+    price:13,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'ocb_slim_prem',
+    cat:'Accessoires',
+    name:'OCB SLIM PREMIUM ORO',
+    price:15,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+  {id:'ocb_slim_plus',
+    cat:'Accessoires',
+    name:'OCB SLIM PREMIUM + FILTRES',
+    price:20,
+    type:'Smoke Accessory',
+    desc:'Essential smoking accessories - lighters, rolling papers, grinders, and more. Quality gear for the everyday smoker.',
+    thumb:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD',
+    detail:'https://placehold.co/300x300/1a1e18/c9a84c?text=CBD'},
+];
+
+let cart = {};
+let currentCat = 'Accessoires';
+let detailProduct = null;
+let detailQty = 1;
+
+// ── RENDER GRID ──
+function renderProducts(cat) {
+  const grid = document.getElementById('productsGrid');
+  const title = document.getElementById('sectionTitle');
+  const list = cat === 'All' ? PRODUCTS : PRODUCTS.filter(p => p.cat === cat || cat === 'Accessoires');
+  title.innerHTML = `<span>🛒</span> ${cat.toUpperCase()}`;
+  if (!list.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;padding:40px;text-align:center;color:#666;">Aucun produit</div>`;
+    return;
+  }
+  grid.innerHTML = list.map(p => `
+    <div class="product-card" onclick="openDetail('${p.id}')">
+      <div class="product-img-wrap">
+        <img src="${p.thumb}" alt="${p.name}" loading="lazy"/>
+        <div class="badge-stock"><div class="dot-green"></div> IN STOCK</div>
+      </div>
+      <div class="product-info">
+        <div class="product-cat">${p.cat}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-footer">
+          <div class="product-price">${p.price} <span class="currency">DH</span></div>
+          <div class="btn-add ${cart[p.id]?'added':''}" id="btn-${p.id}" onclick="event.stopPropagation();quickAdd('${p.id}')">${cart[p.id]||'+'}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── DETAIL ──
+function openDetail(id) {
+  const p = PRODUCTS.find(x => x.id === id);
+  if (!p) return;
+  detailProduct = p;
+  detailQty = 1;
+  document.getElementById('detailImg').src = p.detail || p.thumb;
+  document.getElementById('detailName').textContent = p.name;
+  document.getElementById('detailPriceTop').textContent = p.price + ' DH';
+  document.getElementById('detailTypeLabel').textContent = p.type.toUpperCase();
+  document.getElementById('detailTags').innerHTML = `
+    <div class="detail-tag">Accessoires <span class="tag-meta">TYPE</span></div>
+    <div class="detail-tag">In Stock <span class="tag-meta">STOCK</span></div>`;
+  document.getElementById('detailDesc').textContent = p.desc;
+  document.getElementById('detailPriceBtn').textContent = p.price + ' DH';
+  updateDetailQty();
+  const page = document.getElementById('detailPage');
+  page.classList.add('open');
+  page.scrollTop = 0;
+  updateDetailCartBtn();
+}
+
+function closeDetail() {
+  document.getElementById('detailPage').classList.remove('open');
+}
+
+function updateDetailQty() {
+  if (!detailProduct) return;
+  document.getElementById('detailQtyX').textContent = '×' + detailQty;
+  document.getElementById('detailQtyDh').textContent = (detailProduct.price * detailQty) + ' DH';
+  document.getElementById('detailPriceBtn').textContent = (detailProduct.price * detailQty) + ' DH';
+}
+
+function changeDetailQty() {
+  detailQty = detailQty < 10 ? detailQty + 1 : 1;
+  updateDetailQty();
+}
+
+function updateDetailCartBtn() {
+  if (!detailProduct) return;
+  const btn = document.getElementById('btnAddToCart');
+  const inCart = cart[detailProduct.id] || 0;
+  if (inCart > 0) {
+    btn.classList.add('added');
+    btn.textContent = '✓ DANS LE PANIER (' + inCart + ')';
+  } else {
+    btn.classList.remove('added');
+    btn.innerHTML = 'ADD TO CART · <span id="detailPriceBtn">' + (detailProduct.price * detailQty) + ' DH</span>';
+  }
+}
+
+function addFromDetail() {
+  if (!detailProduct) return;
+  cart[detailProduct.id] = (cart[detailProduct.id] || 0) + detailQty;
+  updateBadges();
+  updateDetailCartBtn();
+  showToast(detailProduct.name + ' ajouté ✓');
+  renderProducts(currentCat);
+}
+
+// ── QUICK ADD (from grid) ──
+function quickAdd(id) {
+  const p = PRODUCTS.find(x => x.id === id);
+  cart[id] = (cart[id] || 0) + 1;
+  updateBadges();
+  showToast(p.name + ' ajouté ✓');
+  renderProducts(currentCat);
+}
+
+// ── BADGES ──
+function updateBadges() {
+  const total = Object.values(cart).reduce((a,b) => a+b, 0);
+  ['headerBadge','floatBadge'].forEach(id => {
+    const el = document.getElementById(id);
+    if (total > 0) { el.style.display='flex'; el.textContent=total; }
+    else el.style.display='none';
+  });
+  if (detailProduct) {
+    const db = document.getElementById('detailBadge');
+    if (total > 0) { db.style.display='flex'; db.textContent=total; }
+    else db.style.display='none';
+  }
+}
+
+// ── CART DRAWER ──
+function toggleCart() {
+  const drawer = document.getElementById('cartDrawer');
+  const overlay = document.getElementById('overlay');
+  if (drawer.classList.contains('open')) {
+    drawer.classList.remove('open');
+    overlay.classList.remove('open');
+  } else {
+    renderCart();
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+  }
+}
+
+function renderCart() {
+  const items = document.getElementById('cartItems');
+  const footer = document.getElementById('cartFooter');
+  const totalEl = document.getElementById('cartTotal');
+  const keys = Object.keys(cart).filter(k => cart[k] > 0);
+  if (!keys.length) { items.innerHTML='<div class="cart-empty">🛒 Votre panier est vide</div>'; footer.style.display='none'; return; }
+  let total = 0;
+  items.innerHTML = keys.map(id => {
+    const p = PRODUCTS.find(x => x.id===id);
+    total += p.price * cart[id];
+    return `<div class="cart-item">
+      <img src="${p.thumb}" alt="${p.name}"/>
+      <div class="cart-item-info"><div class="cart-item-name">${p.name}</div><div class="cart-item-price">${p.price * cart[id]} DH</div></div>
+      <div class="cart-qty-ctrl">
+        <div class="qty-btn" onclick="changeQty('${id}',-1)">−</div>
+        <div class="qty-num">${cart[id]}</div>
+        <div class="qty-btn" onclick="changeQty('${id}',1)">+</div>
+      </div>
+    </div>`;
+  }).join('');
+  totalEl.textContent = total + ' DH';
+  footer.style.display = 'block';
+}
+
+function changeQty(id, d) {
+  cart[id] = (cart[id]||0) + d;
+  if (cart[id] <= 0) delete cart[id];
+  updateBadges(); renderCart(); renderProducts(currentCat);
+  if (detailProduct && detailProduct.id === id) updateDetailCartBtn();
+}
+
+function checkout() {
+  const keys = Object.keys(cart).filter(k => cart[k]>0);
+  if (!keys.length) return;
+  let msg = 'Bonjour, je souhaite commander:%0A';
+  keys.forEach(id => { const p=PRODUCTS.find(x=>x.id===id); msg+=`- ${p.name} x${cart[id]} = ${p.price*cart[id]} DH%0A`; });
+  const total = keys.reduce((a,id)=>a+PRODUCTS.find(x=>x.id===id).price*cart[id],0);
+  msg += `%0ATotal: ${total} DH`;
+  window.open(`https://t.me/chocolatrichome_bot?text=${msg}`,'_blank');
+}
+
+// ── MENU ──
+function openMenu() { document.getElementById('sideMenu').classList.add('open'); document.getElementById('overlay').classList.add('open'); }
+function closeAll() {
+  document.getElementById('sideMenu').classList.remove('open');
+  document.getElementById('cartDrawer').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+function filterCat(cat) { currentCat=cat; renderProducts(cat); }
+
+// ── TOAST ──
+function showToast(msg) {
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+renderProducts('Accessoires');
+</script>
+</body>
+</html>
